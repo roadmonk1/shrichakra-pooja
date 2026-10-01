@@ -613,6 +613,11 @@ export const translations = {
       kn: 'ನಿರ್ವಾಹಕ ಪ್ರವೇಶ',
       sa: 'प्रबन्धक प्रवेशः'
     },
+    checklistBtn: {
+      en: 'Client Checklist',
+      kn: 'ಕ್ಲೈಂಟ್ ಪರಿಶೀಲನಾ ಪಟ್ಟಿ',
+      sa: 'अवलोकन सूचिका'
+    },
     copyright: {
       en: '© 2026 Shri Chakra Pooja — Shri Kshethra Kukkikatte. All rights reserved.',
       kn: '© ೨೦೨೬ ಶ್ರೀಚಕ್ರ ಮಹಾಪೂಜಾ ಸಮಿತಿ — ಶ್ರೀ ಕ್ಷೇತ್ರ ಕುಕ್ಕಿಕಟ್ಟೆ. ಸರ್ವ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.',

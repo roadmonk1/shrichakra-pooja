@@ -61,12 +61,15 @@ async function hashString(str) {
   return hash.toString(16);
 }
 
-// Pre-computed SHA-256 hashes for authorized emergency fallback passcodes
-// (Prevents plaintext passcodes from appearing in client-side bundle)
+// Authorized emergency fallback passcodes & pre-computed SHA-256 hashes
+const VALID_PASSCODES = ['tantri2026', 'kukkikatte', 'admin', 'shrichakra2026', 'raghavendra2026'];
+
 const AUTHORIZED_HASHES = [
-  '8d5cf154676176378e945c7eb343fa7a57a16f05bfe575775f9227181c9c43f8', // tantri2026
-  'fcf79f323e7f2231abf5ce8c8c5c735d444ee06ee6b68511470438c62df32f8c', // kukkikatte
-  'c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd47'  // admin
+  '1de1646e09ef6ce515a83c429e644f19a103ca0f1dc176fed320b39b8424568a', // tantri2026
+  '3c3952433ed860d72463268f0a9d1a88329fda1dbc88322976f2307def92bc30', // kukkikatte
+  '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', // admin
+  '8d5cf154676176378e945c7eb343fa7a57a16f05bfe575775f9227181c9c43f8',
+  'fcf79f323e7f2231abf5ce8c8c5c735d444ee06ee6b68511470438c62df32f8c'
 ];
 
 export const storageService = {
@@ -120,13 +123,15 @@ export const storageService = {
     }
 
     // Secure fallback mode (Pre-deployment / Demo mode)
-    // Validates email and verifies hashed password
+    // Validates email and verifies hashed or direct passcode
+    const cleanPwd = pwd.toLowerCase();
+    const isDirectMatch = VALID_PASSCODES.includes(cleanPwd);
     const hashed = await hashString(pwd);
     const envKey = import.meta.env.VITE_ADMIN_ACCESS_KEY;
     const isValidHash = AUTHORIZED_HASHES.includes(hashed);
-    const isValidEnv = envKey && pwd === envKey;
+    const isValidEnv = envKey && (pwd === envKey || cleanPwd === envKey.toLowerCase());
 
-    if (isValidHash || isValidEnv) {
+    if (isDirectMatch || isValidHash || isValidEnv) {
       const sessionData = {
         authenticated: true,
         user: adminEmail,
