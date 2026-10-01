@@ -14,7 +14,8 @@ import {
   Phone,
   MessageCircle,
   ExternalLink,
-  BookOpen
+  BookOpen,
+  Camera
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import SriChakraSvg from '../animations/SriChakraSvg';
@@ -31,6 +32,7 @@ export default function HomePage({
   const [activeLayerPreview, setActiveLayerPreview] = useState(0);
 
   const featuredPhotos = (galleryPhotos || []).filter(p => p.featured).slice(0, 3);
+  const displayPhotos = featuredPhotos.length > 0 ? featuredPhotos : (galleryPhotos || []).slice(0, 3);
 
   // Dynamic event data with fallback to 25 October 2026
   const eventTitle = featuredEvent ? resolveText(featuredEvent.title, 'Annual Shri Chakra Pooja 2026') : 'Annual Shri Chakra Pooja 2026';
@@ -1079,77 +1081,110 @@ export default function HomePage({
               gap: '24px'
             }}
           >
-            {featuredPhotos.map((photo) => (
+            {displayPhotos.length === 0 ? (
               <div
-                key={photo.id}
-                onClick={() => {
-                  setActivePage('gallery');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
                 className="spiritual-card"
                 style={{
+                  gridColumn: '1 / -1',
+                  padding: '50px 24px',
+                  textAlign: 'center',
+                  background: 'rgba(12, 2, 7, 0.65)',
                   borderRadius: '12px',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  border: '1px solid rgba(229, 185, 100, 0.35)'
+                  border: '1px dashed rgba(229, 185, 100, 0.35)'
                 }}
               >
-                <div style={{ position: 'relative', height: '240px', overflow: 'hidden' }}>
-                  <img
-                    src={photo.thumbnailUrl || photo.imageUrl}
-                    alt={photo.caption}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      transition: 'transform 0.5s ease'
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-                  />
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '12px',
-                      left: '12px',
-                      background: 'rgba(8, 1, 4, 0.9)',
-                      border: '1px solid rgba(229, 185, 100, 0.6)',
-                      color: '#ffd983',
-                      fontSize: '0.74rem',
-                      fontWeight: 700,
-                      padding: '3px 10px',
-                      borderRadius: '6px',
-                      fontFamily: 'var(--font-serif)'
-                    }}
-                  >
-                    {photo.year}
-                  </span>
-                  <span
-                    style={{
-                      position: 'absolute',
-                      bottom: '12px',
-                      right: '12px',
-                      background: 'rgba(0,0,0,0.75)',
-                      fontSize: '0.68rem',
-                      color: '#e5b964',
-                      padding: '3px 8px',
-                      borderRadius: '4px',
-                      border: '1px solid rgba(229, 185, 100, 0.3)'
-                    }}
-                  >
-                    {photo.category === 'OFFICIAL' ? 'TEMPLE OFFICIAL' : 'DEVOTEE MEMORY'}
-                  </span>
-                </div>
-                <div style={{ padding: '16px' }}>
-                  <p style={{ fontSize: '0.88rem', color: '#f5ebd9', lineHeight: 1.45, fontWeight: 600 }}>
-                    {photo.caption}
-                  </p>
-                  <p style={{ fontSize: '0.74rem', color: '#dac8af', marginTop: '6px' }}>
-                    {t('gallery.uploadedBy')} {photo.uploadedBy}
-                  </p>
-                </div>
+                <Camera size={36} className="text-[#dfb15b]" style={{ margin: '0 auto 14px', opacity: 0.85 }} />
+                <h3 className="font-cinzel text-gold-light" style={{ fontSize: '1.2rem', marginBottom: '8px' }}>
+                  {t('gallery.noPhotos')}
+                </h3>
+                <p style={{ color: '#dac8af', fontSize: '0.9rem', marginBottom: '18px' }}>
+                  Official photographs of the annual rituals will be published here once available.
+                </p>
+                <button
+                  onClick={() => {
+                    setActivePage('share');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="btn-gold-primary"
+                  style={{ fontSize: '0.84rem', padding: '9px 20px' }}
+                >
+                  <Heart size={14} />
+                  <span>{t('nav.share')}</span>
+                </button>
               </div>
-            ))}
+            ) : (
+              displayPhotos.map((photo) => (
+                <div
+                  key={photo.id}
+                  onClick={() => {
+                    setActivePage('gallery');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="spiritual-card"
+                  style={{
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    border: '1px solid rgba(229, 185, 100, 0.35)'
+                  }}
+                >
+                  <div style={{ position: 'relative', height: '240px', overflow: 'hidden' }}>
+                    <img
+                      src={photo.thumbnailUrl || photo.imageUrl}
+                      alt={photo.caption}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        transition: 'transform 0.5s ease'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                    />
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: '12px',
+                        left: '12px',
+                        background: 'rgba(8, 1, 4, 0.9)',
+                        border: '1px solid rgba(229, 185, 100, 0.6)',
+                        color: '#ffd983',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        padding: '3px 10px',
+                        borderRadius: '6px',
+                        fontFamily: 'var(--font-serif)'
+                      }}
+                    >
+                      {photo.year}
+                    </span>
+                    <span
+                      style={{
+                        position: 'absolute',
+                        bottom: '12px',
+                        right: '12px',
+                        background: 'rgba(0,0,0,0.75)',
+                        fontSize: '0.68rem',
+                        color: '#e5b964',
+                        padding: '3px 8px',
+                        borderRadius: '4px',
+                        border: '1px solid rgba(229, 185, 100, 0.3)'
+                      }}
+                    >
+                      {photo.category === 'OFFICIAL' ? 'TEMPLE OFFICIAL' : 'DEVOTEE MEMORY'}
+                    </span>
+                  </div>
+                  <div style={{ padding: '16px' }}>
+                    <p style={{ fontSize: '0.88rem', color: '#f5ebd9', lineHeight: 1.45, fontWeight: 600 }}>
+                      {photo.caption}
+                    </p>
+                    <p style={{ fontSize: '0.74rem', color: '#dac8af', marginTop: '6px' }}>
+                      {t('gallery.uploadedBy')} {photo.uploadedBy}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>

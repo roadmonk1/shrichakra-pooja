@@ -14,7 +14,9 @@ export default function GalleryPage({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const years = ['ALL', '2026', '2025', '2024', '2023'];
+  const uniqueYears = Array.from(new Set(['2026', '2025', '2024', '2023', ...(galleryPhotos || []).map(p => p.year)])).filter(Boolean);
+  uniqueYears.sort((a, b) => Number(b) - Number(a));
+  const years = ['ALL', ...uniqueYears];
 
   // Filter photos by both year and category
   const filteredPhotos = (galleryPhotos || []).filter((p) => {
@@ -185,10 +187,27 @@ export default function GalleryPage({
         <div className="container">
           {filteredPhotos.length === 0 ? (
             <div
-              className="spiritual-card"
-              style={{ padding: '60px 20px', textAlign: 'center', color: '#dac8af' }}
+              className="spiritual-card gold-ornate-card"
+              style={{ padding: '60px 24px', textAlign: 'center', color: '#dac8af', maxWidth: '640px', margin: '0 auto' }}
             >
-              <p style={{ fontSize: '1rem' }}>{t('gallery.noPhotos')}</p>
+              <Camera size={38} className="text-[#dfb15b]" style={{ margin: '0 auto 16px', opacity: 0.85 }} />
+              <h3 className="font-cinzel text-gold-light" style={{ fontSize: '1.25rem', marginBottom: '8px' }}>
+                {t('gallery.noPhotos')}
+              </h3>
+              <p style={{ fontSize: '0.88rem', color: '#bca992', marginBottom: '20px' }}>
+                Official temple photography and devotee moments will be presented here once consecrated rituals conclude.
+              </p>
+              <button
+                onClick={() => {
+                  setActivePage('share');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="btn-gold-primary"
+                style={{ fontSize: '0.84rem', padding: '10px 22px' }}
+              >
+                <Heart size={14} />
+                <span>{t('nav.share')}</span>
+              </button>
             </div>
           ) : (
             <div

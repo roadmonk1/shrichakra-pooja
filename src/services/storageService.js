@@ -269,7 +269,13 @@ export const storageService = {
   // GALLERY PHOTOS (OFFICIAL & DEVOTEE COMMUNITY PHOTOS)
   // ==============================================================
   getApprovedGalleryPhotos: (yearFilter = 'ALL', categoryFilter = 'ALL') => {
-    const photos = getStored(STORAGE_KEYS.GALLERY, initialGalleryPhotos);
+    const raw = getStored(STORAGE_KEYS.GALLERY, initialGalleryPhotos);
+    // Purge any legacy stock demo photos
+    const photos = raw.filter(p => !p.id.startsWith('gal-official-20') && !p.id.startsWith('gal-community-20') && !p.imageUrl?.includes('images.unsplash.com'));
+    if (photos.length !== raw.length) {
+      setStored(STORAGE_KEYS.GALLERY, photos);
+    }
+
     let filtered = photos.filter(p => p.status === 'APPROVED');
     
     if (yearFilter !== 'ALL') {
@@ -282,11 +288,119 @@ export const storageService = {
   },
 
   getAllGalleryPhotos: () => {
-    return getStored(STORAGE_KEYS.GALLERY, initialGalleryPhotos);
+    const raw = getStored(STORAGE_KEYS.GALLERY, initialGalleryPhotos);
+    const photos = raw.filter(p => !p.id.startsWith('gal-official-20') && !p.id.startsWith('gal-community-20') && !p.imageUrl?.includes('images.unsplash.com'));
+    if (photos.length !== raw.length) {
+      setStored(STORAGE_KEYS.GALLERY, photos);
+    }
+    return photos;
+  },
+
+  // Upload an actual image file (JPG, PNG, WebP) from device
+  uploadGalleryImage: async (file, { year = '2026', onProgress } = {}) => {
+    if (!file) {
+      throw new Error('No image file selected.');
+    }
+
+    // Supported formats
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const fileType = (file.type || '').toLowerCase();
+    if (!allowedTypes.includes(fileType)) {
+      throw new Error('Unsupported image format. Please select a JPG, PNG, or WebP photo.');
+    }
+
+    // 15 MB reasonable limit
+    const maxSizeBytes = 15 * 1024 * 1024;
+    if (file.size > maxSizeBytes) {
+      throw new Error('File exceeds the 15MB size limit. Please choose a smaller photo.');
+    }
+
+    if (onProgress) onProgress(20);
+
+    // If Supabase Storage is configured, upload to cloud bucket
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const fileExt = file.name.split('.').pop() || 'jpg';
+        const cleanName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+        const filePath = `official/${year}/${cleanName}`;
+
+        if (onProgress) onProgress(45);
+
+        // Upload to 'gallery' bucket
+        let { data, error } = await supabase.storage
+          .from('gallery')
+          .upload(filePath, file, {
+            cacheControl: '31536000',
+            upsert: false
+          });
+
+        if (error) {
+          // Fallback to 'temple-photos' bucket if 'gallery' doesn't exist
+          const retry = await supabase.storage
+            .from('temple-photos')
+            .upload(filePath, file, {
+              cacheControl: '31536000',
+              upsert: false
+            });
+          
+          if (!retry.error) {
+            const { data: publicUrlData } = supabase.storage.from('temple-photos').getPublicUrl(filePath);
+            if (onProgress) onProgress(100);
+            return { success: true, url: publicUrlData.publicUrl, isCloud: true };
+          }
+          console.warn('Supabase storage bucket upload error, using optimized local storage:', error);
+        } else {
+          const { data: publicUrlData } = supabase.storage.from('gallery').getPublicUrl(filePath);
+          if (onProgress) onProgress(100);
+          return { success: true, url: publicUrlData.publicUrl, isCloud: true };
+        }
+      } catch (cloudErr) {
+        console.warn('Cloud storage exception, switching to client storage:', cloudErr);
+      }
+    }
+
+    // Client-side Canvas optimization (works 100% offline, mobile, and web)
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          if (onProgress) onProgress(65);
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1600;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          if (onProgress) onProgress(90);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          if (onProgress) onProgress(100);
+          resolve({ success: true, url: compressedDataUrl, isCloud: false });
+        };
+        img.onerror = () => reject(new Error('Failed to render selected image.'));
+        img.src = e.target.result;
+      };
+      reader.onerror = () => reject(new Error('Failed to read image file from device.'));
+      reader.readAsDataURL(file);
+    });
   },
 
   addGalleryPhoto: async (photoData) => {
-    const photos = getStored(STORAGE_KEYS.GALLERY, initialGalleryPhotos);
+    const raw = getStored(STORAGE_KEYS.GALLERY, initialGalleryPhotos);
+    const photos = raw.filter(p => !p.id.startsWith('gal-official-20') && !p.id.startsWith('gal-community-20') && !p.imageUrl?.includes('images.unsplash.com'));
+
     const newPhoto = {
       id: `gal-${Date.now()}`,
       category: photoData.category || 'OFFICIAL',
@@ -319,10 +433,19 @@ export const storageService = {
     return newPhoto;
   },
 
-  deleteGalleryPhoto: (id) => {
-    const photos = getStored(STORAGE_KEYS.GALLERY, initialGalleryPhotos);
-    const updated = photos.filter(p => p.id !== id);
+  deleteGalleryPhoto: async (id) => {
+    const raw = getStored(STORAGE_KEYS.GALLERY, initialGalleryPhotos);
+    const updated = raw.filter(p => p.id !== id);
     setStored(STORAGE_KEYS.GALLERY, updated);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('gallery_photos').delete().eq('id', id);
+      } catch (err) {
+        console.warn('Supabase gallery delete warning:', err);
+      }
+    }
+
     return updated;
   },
 
@@ -330,7 +453,12 @@ export const storageService = {
   // VISITOR PHOTO SUBMISSIONS (VISITOR -> PENDING -> APPROVAL)
   // ==============================================================
   getSubmissions: () => {
-    return getStored(STORAGE_KEYS.SUBMISSIONS, initialPhotoSubmissions);
+    const raw = getStored(STORAGE_KEYS.SUBMISSIONS, initialPhotoSubmissions);
+    const valid = raw.filter(s => !s.id.startsWith('sub-demo-') && !s.imageUrl?.includes('images.unsplash.com'));
+    if (valid.length !== raw.length) {
+      setStored(STORAGE_KEYS.SUBMISSIONS, valid);
+    }
+    return valid;
   },
 
   submitVisitorPhoto: async ({ name, contact, year, caption, imageBase64, imageFile }) => {

@@ -22,7 +22,10 @@ import {
   Archive,
   Star,
   LogOut,
-  UploadCloud
+  UploadCloud,
+  Camera,
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { supabaseSqlSchema } from '../services/storageService';
@@ -55,11 +58,16 @@ export default function AdminPage({
   // Official photo upload state
   const [newPhotoData, setNewPhotoData] = useState({
     year: '2026',
+    customYear: '',
     category: 'OFFICIAL',
     caption: '',
-    imageUrl: '',
     uploadedBy: 'Shri Raghavendra Tantri (Admin)'
   });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   const loadData = () => {
     const isAuth = storageService.isAdminAuthenticated();
@@ -248,37 +256,96 @@ export default function AdminPage({
     setTimeout(() => setFeedbackMsg(''), 3000);
   };
 
-  const handleAddOfficialPhoto = (e) => {
-    e.preventDefault();
-    if (!newPhotoData.imageUrl.trim() || !newPhotoData.caption.trim()) return;
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    setUploadError('');
+    if (!file) return;
 
-    storageService.addGalleryPhoto({
-      year: newPhotoData.year,
-      category: 'OFFICIAL',
-      caption: newPhotoData.caption,
-      imageUrl: newPhotoData.imageUrl,
-      thumbnailUrl: newPhotoData.imageUrl,
-      uploadedBy: newPhotoData.uploadedBy || 'Shri Raghavendra Tantri (Admin)'
-    });
+    const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const fileType = (file.type || '').toLowerCase();
+    if (!allowed.includes(fileType)) {
+      setUploadError('Unsupported format. Please select a JPG, PNG, or WebP photo.');
+      return;
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      setUploadError('Image size exceeds 15MB. Please choose a smaller photo.');
+      return;
+    }
 
-    setNewPhotoData({
-      year: '2026',
-      category: 'OFFICIAL',
-      caption: '',
-      imageUrl: '',
-      uploadedBy: 'Shri Raghavendra Tantri (Admin)'
-    });
-
-    loadData();
-    setFeedbackMsg('Official temple photograph published to the public gallery!');
-    setTimeout(() => setFeedbackMsg(''), 3000);
+    setSelectedFile(file);
+    if (filePreview) {
+      URL.revokeObjectURL(filePreview);
+    }
+    setFilePreview(URL.createObjectURL(file));
   };
 
-  const handleDeleteGallery = (id) => {
-    storageService.deleteGalleryPhoto(id);
-    loadData();
-    setFeedbackMsg('Gallery photo removed.');
-    setTimeout(() => setFeedbackMsg(''), 3000);
+  const handleAddOfficialPhoto = async (e) => {
+    e.preventDefault();
+    setUploadError('');
+
+    if (!selectedFile) {
+      setUploadError('Please select an image file from your device.');
+      return;
+    }
+    if (!newPhotoData.caption.trim()) {
+      setUploadError('Please provide a caption or ritual description.');
+      return;
+    }
+
+    const effectiveYear = newPhotoData.year === 'CUSTOM'
+      ? (newPhotoData.customYear.trim() || '2026')
+      : newPhotoData.year;
+
+    setIsUploadingPhoto(true);
+    setUploadProgress(15);
+
+    try {
+      const uploadRes = await storageService.uploadGalleryImage(selectedFile, {
+        year: effectiveYear,
+        onProgress: (p) => setUploadProgress(p)
+      });
+
+      if (!uploadRes.success || !uploadRes.url) {
+        throw new Error(uploadRes.error || 'Failed to upload image.');
+      }
+
+      await storageService.addGalleryPhoto({
+        year: effectiveYear,
+        category: 'OFFICIAL',
+        caption: newPhotoData.caption.trim(),
+        imageUrl: uploadRes.url,
+        thumbnailUrl: uploadRes.url,
+        uploadedBy: newPhotoData.uploadedBy || 'Shri Raghavendra Tantri (Admin)'
+      });
+
+      setSelectedFile(null);
+      if (filePreview) {
+        URL.revokeObjectURL(filePreview);
+        setFilePreview(null);
+      }
+      setNewPhotoData(prev => ({
+        ...prev,
+        caption: '',
+        customYear: ''
+      }));
+      setUploadProgress(0);
+      loadData();
+      setFeedbackMsg(`Official photograph published successfully for celebration year ${effectiveYear}!`);
+      setTimeout(() => setFeedbackMsg(''), 4000);
+    } catch (err) {
+      setUploadError(err.message || 'Failed to publish photo. Please try again.');
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
+
+  const handleDeleteGallery = async (id) => {
+    if (window.confirm('Are you sure you want to remove this photo from the official gallery?')) {
+      await storageService.deleteGalleryPhoto(id);
+      loadData();
+      setFeedbackMsg('Gallery photo removed.');
+      setTimeout(() => setFeedbackMsg(''), 3000);
+    }
   };
 
   const handleCopySql = () => {
@@ -1049,68 +1116,284 @@ export default function AdminPage({
             {/* Upload Official Photo Form */}
             <div
               className="spiritual-card gold-ornate-card"
-              style={{ padding: '24px', marginBottom: '32px', border: '1px solid rgba(229, 185, 100, 0.4)' }}
+              style={{ padding: '28px', marginBottom: '36px', border: '1.5px solid rgba(229, 185, 100, 0.45)' }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-                <UploadCloud size={20} className="text-[#e5b964]" />
-                <h3 className="font-cinzel text-gold-light" style={{ fontSize: '1.15rem', fontWeight: 800 }}>
-                  Upload Official Temple Photograph
-                </h3>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div
+                    style={{
+                      width: '38px',
+                      height: '38px',
+                      borderRadius: '8px',
+                      background: 'rgba(229, 185, 100, 0.15)',
+                      border: '1px solid rgba(229, 185, 100, 0.4)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <UploadCloud size={20} className="text-[#ffd700]" />
+                  </div>
+                  <div>
+                    <h3 className="font-cinzel text-gold-light" style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0 }}>
+                      Upload Official Temple Photograph
+                    </h3>
+                    <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#dac8af' }}>
+                      Publish authentic pooja photos directly from your computer or phone camera/gallery.
+                    </p>
+                  </div>
+                </div>
+
+                <span
+                  style={{
+                    fontSize: '0.72rem',
+                    color: '#e5b964',
+                    background: 'rgba(229, 185, 100, 0.12)',
+                    padding: '3px 10px',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(229, 185, 100, 0.3)'
+                  }}
+                >
+                  JPG, PNG, WebP • Max 15MB
+                </span>
               </div>
 
-              <form onSubmit={handleAddOfficialPhoto} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+              <form onSubmit={handleAddOfficialPhoto} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {/* 1. File Upload Drop / Picker Area */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#e5b964', marginBottom: '4px' }}>
-                    Photo Image URL *
+                  <label style={{ display: 'block', fontSize: '0.82rem', color: '#ffd983', marginBottom: '8px', fontWeight: 600 }}>
+                    Select Image File *
                   </label>
-                  <input
-                    type="url"
-                    required
-                    value={newPhotoData.imageUrl}
-                    onChange={(e) => setNewPhotoData({ ...newPhotoData, imageUrl: e.target.value })}
-                    placeholder="https://images.unsplash.com/..."
-                    className="form-input"
-                  />
+
+                  {!filePreview ? (
+                    <label
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '36px 20px',
+                        background: 'rgba(8, 1, 4, 0.75)',
+                        border: '2px dashed rgba(229, 185, 100, 0.45)',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.25s ease'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#ffd700')}
+                      onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(229, 185, 100, 0.45)')}
+                    >
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/jpg"
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
+                      />
+                      <div
+                        style={{
+                          width: '52px',
+                          height: '52px',
+                          borderRadius: '50%',
+                          background: 'rgba(229, 185, 100, 0.15)',
+                          border: '1px solid rgba(229, 185, 100, 0.4)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginBottom: '12px'
+                        }}
+                      >
+                        <Camera size={26} className="text-[#ffd700]" />
+                      </div>
+                      <span style={{ color: '#f5eedb', fontSize: '0.94rem', fontWeight: 600, marginBottom: '4px' }}>
+                        Click to Choose Photo or Take Camera Picture
+                      </span>
+                      <span style={{ color: '#dac8af', fontSize: '0.78rem' }}>
+                        Choose from computer files, phone library, or mobile camera
+                      </span>
+                    </label>
+                  ) : (
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '16px',
+                        padding: '14px',
+                        background: 'rgba(8, 1, 4, 0.85)',
+                        border: '1.5px solid rgba(229, 185, 100, 0.5)',
+                        borderRadius: '10px'
+                      }}
+                    >
+                      <img
+                        src={filePreview}
+                        alt="Upload preview"
+                        style={{
+                          width: '100px',
+                          height: '80px',
+                          objectFit: 'cover',
+                          borderRadius: '6px',
+                          border: '1px solid rgba(229, 185, 100, 0.4)'
+                        }}
+                      />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ color: '#ffd983', fontSize: '0.88rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {selectedFile?.name}
+                        </div>
+                        <div style={{ color: '#dac8af', fontSize: '0.76rem', marginTop: '3px' }}>
+                          Size: {selectedFile ? (selectedFile.size / (1024 * 1024)).toFixed(2) : 0} MB • Ready to upload
+                        </div>
+                      </div>
+                      <label
+                        style={{
+                          background: 'rgba(229, 185, 100, 0.15)',
+                          border: '1px solid rgba(229, 185, 100, 0.45)',
+                          color: '#ffd983',
+                          padding: '6px 14px',
+                          borderRadius: '4px',
+                          fontSize: '0.78rem',
+                          cursor: 'pointer',
+                          fontWeight: 600
+                        }}
+                      >
+                        Change Photo
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/jpg"
+                          onChange={handleFileChange}
+                          style={{ display: 'none' }}
+                        />
+                      </label>
+                    </div>
+                  )}
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#e5b964', marginBottom: '4px' }}>
-                    Caption / Ritual Description *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={newPhotoData.caption}
-                    onChange={(e) => setNewPhotoData({ ...newPhotoData, caption: e.target.value })}
-                    placeholder="Consecrated Navavarana Archana deepam..."
-                    className="form-input"
-                  />
+                {/* 2. Metadata Inputs Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+                  {/* Celebration Year Dropdown with Dynamic Past/Present/Future Support */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#e5b964', marginBottom: '6px', fontWeight: 600 }}>
+                      Celebration Year *
+                    </label>
+                    <select
+                      value={newPhotoData.year}
+                      onChange={(e) => setNewPhotoData({ ...newPhotoData, year: e.target.value })}
+                      className="form-input"
+                    >
+                      <option value="2028">2028 (Future Pooja)</option>
+                      <option value="2027">2027 (Next Annual Pooja)</option>
+                      <option value="2026">2026 (Current Annual Pooja)</option>
+                      <option value="2025">2025 (Annual Pooja)</option>
+                      <option value="2024">2024 (Annual Pooja)</option>
+                      <option value="2023">2023 (Annual Pooja)</option>
+                      <option value="2022">2022 (Annual Pooja)</option>
+                      <option value="2021">2021 (Annual Pooja)</option>
+                      <option value="2020">2020 (Annual Pooja)</option>
+                      <option value="CUSTOM">Custom Year / Earlier Archive...</option>
+                    </select>
+
+                    {newPhotoData.year === 'CUSTOM' && (
+                      <input
+                        type="text"
+                        placeholder="Enter 4-digit Year (e.g. 2018)"
+                        value={newPhotoData.customYear}
+                        onChange={(e) => setNewPhotoData({ ...newPhotoData, customYear: e.target.value })}
+                        className="form-input"
+                        style={{ marginTop: '8px' }}
+                      />
+                    )}
+                  </div>
+
+                  {/* Caption / Description */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#e5b964', marginBottom: '6px', fontWeight: 600 }}>
+                      Caption / Ritual Description *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newPhotoData.caption}
+                      onChange={(e) => setNewPhotoData({ ...newPhotoData, caption: e.target.value })}
+                      placeholder="e.g. Maha Mangala Aarti at Shri Rama Nilaya sanctum"
+                      className="form-input"
+                    />
+                  </div>
+
+                  {/* Custodian Attribution */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#e5b964', marginBottom: '6px', fontWeight: 600 }}>
+                      Uploader / Attribution
+                    </label>
+                    <input
+                      type="text"
+                      value={newPhotoData.uploadedBy}
+                      onChange={(e) => setNewPhotoData({ ...newPhotoData, uploadedBy: e.target.value })}
+                      placeholder="Shri Raghavendra Tantri (Admin)"
+                      className="form-input"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#e5b964', marginBottom: '4px' }}>
-                    Celebration Year
-                  </label>
-                  <select
-                    value={newPhotoData.year}
-                    onChange={(e) => setNewPhotoData({ ...newPhotoData, year: e.target.value })}
-                    className="form-input"
+                {/* Upload Progress Indicator */}
+                {isUploadingPhoto && (
+                  <div style={{ background: 'rgba(8, 1, 4, 0.85)', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(229, 185, 100, 0.35)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#ffd983', marginBottom: '6px' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Loader2 size={13} className="animate-spin text-[#ffd700]" />
+                        Optimizing & uploading photograph...
+                      </span>
+                      <span>{uploadProgress}%</span>
+                    </div>
+                    <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div
+                        style={{
+                          width: `${uploadProgress}%`,
+                          height: '100%',
+                          background: 'linear-gradient(90deg, #dfb15b 0%, #ffd700 100%)',
+                          transition: 'width 0.3s ease'
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Error Banner */}
+                {uploadError && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px 14px',
+                      background: 'rgba(239, 68, 68, 0.15)',
+                      border: '1px solid rgba(239, 68, 68, 0.45)',
+                      borderRadius: '6px',
+                      color: '#fca5a5',
+                      fontSize: '0.84rem'
+                    }}
                   >
-                    <option value="2026">2026</option>
-                    <option value="2025">2025</option>
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
-                  </select>
-                </div>
+                    <AlertCircle size={16} className="shrink-0" />
+                    <span>{uploadError}</span>
+                  </div>
+                )}
 
-                <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                {/* Submit Button */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
                   <button
                     type="submit"
+                    disabled={isUploadingPhoto}
                     className="btn-gold-primary"
-                    style={{ width: '100%', padding: '10px 16px', justifyContent: 'center' }}
+                    style={{ padding: '11px 24px', fontSize: '0.9rem', opacity: isUploadingPhoto ? 0.7 : 1 }}
                   >
-                    <Plus size={16} />
-                    <span>Publish Official Photo</span>
+                    {isUploadingPhoto ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        <span>Uploading Photo...</span>
+                      </>
+                    ) : (
+                      <>
+                        <UploadCloud size={16} />
+                        <span>Publish Official Photo</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
