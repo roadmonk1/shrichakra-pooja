@@ -1,0 +1,431 @@
+:root {
+  /* Rich Sacred Palette: Obsidian Black, Deep Maroon, Burgundy & Metallic Gold */
+  --bg-deep: #070104;
+  --bg-elevated: #0e0208;
+  --bg-card: rgba(22, 5, 13, 0.78);
+  --bg-card-hover: rgba(36, 8, 22, 0.92);
+  --border-gold: rgba(223, 177, 91, 0.35);
+  --border-gold-bright: rgba(255, 217, 120, 0.85);
+  --border-gold-glow: rgba(255, 215, 0, 0.5);
+  --gold-primary: #dfb15b;
+  --gold-bright: #ffe58f;
+  --gold-deep: #9d7524;
+  --gold-foil: #f5cf73;
+  --gold-gradient: linear-gradient(135deg, #fff7d6 0%, #f3cf7a 25%, #dfb15b 50%, #b48328 75%, #f5df9a 100%);
+  --gold-gradient-subtle: linear-gradient(180deg, rgba(223, 177, 91, 0.16) 0%, rgba(120, 16, 38, 0.05) 100%);
+  --maroon-deep: #420819;
+  --maroon-burgundy: #5c0d2b;
+  --maroon-glow: rgba(120, 16, 38, 0.45);
+  --text-main: #fdfaf2;
+  --text-muted: #d0c0a7;
+  --font-serif: 'Cinzel', 'Noto Serif Devanagari', Georgia, serif;
+  --font-sub: 'Cormorant Garamond', 'Noto Sans Kannada', serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(138, 18, 44, 0.35) 0%, transparent 60%),
+    radial-gradient(circle at 85% 20%, rgba(223, 177, 91, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 15% 60%, rgba(120, 16, 38, 0.25) 0%, transparent 55%),
+    radial-gradient(circle at 50% 100%, rgba(223, 177, 91, 0.1) 0%, transparent 50%),
+    linear-gradient(180deg, #070104 0%, #100209 40%, #090105 100%);
+  background-attachment: fixed;
+}
+
+/* Custom Gold Scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+}
+::-webkit-scrollbar-track {
+  background: #080104;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #b48328 0%, #54101e 100%);
+  border-radius: 4px;
+  border: 1px solid rgba(223, 177, 91, 0.35);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #dfb15b 0%, #781026 100%);
+}
+
+/* Typography Helpers */
+.font-cinzel {
+  font-family: var(--font-serif);
+}
+
+.font-cormorant {
+  font-family: var(--font-sub);
+}
+
+.text-gold-gradient {
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  text-shadow: 0 0 20px rgba(223, 177, 91, 0.2);
+}
+
+.text-gold-light {
+  color: #fff0bd;
+}
+
+.text-gold-primary {
+  color: #dfb15b;
+}
+
+.text-gold-bright {
+  color: #ffd978;
+}
+
+.text-gold-muted {
+  color: #cbb483;
+}
+
+.text-maroon {
+  color: #e2617a;
+}
+
+/* Glass & Card Styling */
+.spiritual-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border-gold);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 240, 190, 0.16);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  border-radius: 14px;
+}
+
+.spiritual-card:hover {
+  border-color: var(--border-gold-bright);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(223, 177, 91, 0.25);
+  transform: translateY(-3px);
+}
+
+/* Sacred Ornate Frame with Gold Accents */
+.gold-ornate-card {
+  background: linear-gradient(135deg, rgba(32, 7, 18, 0.88) 0%, rgba(14, 3, 9, 0.94) 50%, rgba(28, 6, 15, 0.88) 100%);
+  border: 1.5px solid rgba(223, 177, 91, 0.55);
+  border-radius: 14px;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.8), 0 0 28px rgba(223, 177, 91, 0.22);
+  position: relative;
+  overflow: hidden;
+}
+
+.gold-ornate-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffd883, #dfb15b, transparent);
+  box-shadow: 0 0 12px #dfb15b;
+}
+
+.spiritual-corner {
+  position: relative;
+}
+.spiritual-corner::before,
+.spiritual-corner::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  border-color: rgba(223, 177, 91, 0.7);
+  border-style: solid;
+}
+.spiritual-corner::before {
+  top: 8px;
+  left: 8px;
+  border-width: 1.5px 0 0 1.5px;
+}
+.spiritual-corner::after {
+  bottom: 8px;
+  right: 8px;
+  border-width: 0 1.5px 1.5px 0;
+}
+
+/* Ornamental Divider */
+.ornament-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 36px auto;
+  max-width: 520px;
+}
+.ornament-divider::before,
+.ornament-divider::after {
+  content: '';
+  height: 1.5px;
+  flex: 1;
+  background: linear-gradient(90deg, transparent, rgba(223, 177, 91, 0.65), transparent);
+}
+
+/* Buttons with Rich Gold Foiling */
+.btn-gold-primary {
+  background: linear-gradient(135deg, #f7d57f 0%, #dfb15b 40%, #b2822a 100%);
+  color: #080104;
+  font-weight: 700;
+  font-family: var(--font-serif);
+  letter-spacing: 0.08em;
+  padding: 13px 28px;
+  border-radius: 7px;
+  border: 1px solid #ffe89e;
+  box-shadow: 0 4px 20px rgba(223, 177, 91, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  position: relative;
+  overflow: hidden;
+}
+.btn-gold-primary:hover {
+  background: linear-gradient(135deg, #fff0bd 0%, #f3cf7a 40%, #c59336 100%);
+  box-shadow: 0 6px 30px rgba(223, 177, 91, 0.65), 0 0 15px rgba(255, 215, 0, 0.4);
+  transform: translateY(-2px);
+  color: #000000;
+}
+
+.btn-gold-outline {
+  background: rgba(22, 5, 13, 0.65);
+  color: #fcf6eb;
+  font-weight: 600;
+  font-family: var(--font-serif);
+  letter-spacing: 0.08em;
+  padding: 13px 28px;
+  border-radius: 7px;
+  border: 1.5px solid rgba(223, 177, 91, 0.55);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+.btn-gold-outline:hover {
+  border-color: #ffd883;
+  background: rgba(48, 12, 26, 0.9);
+  color: #ffd883;
+  box-shadow: 0 6px 28px rgba(223, 177, 91, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes slowRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes reverseSlowRotate {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes subtlePulse {
+  0%, 100% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 18px rgba(223, 177, 91, 0.32));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 44px rgba(255, 215, 0, 0.7));
+  }
+}
+
+@keyframes goldShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes floatLight {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes entranceSriChakra {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) rotate(-22deg);
+    filter: blur(10px) drop-shadow(0 0 0 rgba(223, 177, 91, 0));
+  }
+  50% {
+    opacity: 0.92;
+    filter: blur(0px) drop-shadow(0 0 50px rgba(255, 215, 0, 0.75));
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 0 30px rgba(223, 177, 91, 0.45));
+  }
+}
+
+.animate-entrance {
+  animation: entranceSriChakra 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slow-spin {
+  animation: slowRotate 180s linear infinite;
+}
+
+.animate-reverse-spin {
+  animation: reverseSlowRotate 240s linear infinite;
+}
+
+.animate-subtle-pulse {
+  animation: subtlePulse 5.5s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: floatLight 6s ease-in-out infinite;
+}
+
+/* Layout Utilities */
+.container {
+  max-width: 1240px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.section-padding {
+  padding-top: 96px;
+  padding-bottom: 96px;
+}
+
+/* Badge Demo Indicator */
+.demo-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(223, 177, 91, 0.16);
+  border: 1px solid rgba(223, 177, 91, 0.45);
+  color: #ffd883;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-family: var(--font-serif);
+  box-shadow: 0 0 10px rgba(223, 177, 91, 0.15);
+}
+
+.demo-watermark-badge {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: #dfb15b;
+  opacity: 0.85;
+  background: rgba(14, 2, 8, 0.75);
+  padding: 3px 10px;
+  border-radius: 4px;
+  border: 1px dashed rgba(223, 177, 91, 0.45);
+  display: inline-block;
+}
+
+/* Modal styling */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 1, 3, 0.9);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Forms */
+.form-input {
+  width: 100%;
+  background: rgba(16, 4, 10, 0.88);
+  border: 1.5px solid var(--border-gold);
+  border-radius: 7px;
+  padding: 12px 16px;
+  color: #fdfaf2;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+.form-input:focus {
+  border-color: var(--border-gold-bright);
+  box-shadow: 0 0 18px rgba(223, 177, 91, 0.35);
+  background: rgba(24, 6, 15, 0.98);
+}
+
+/* Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-slow-spin,
+  .animate-reverse-spin,
+  .animate-subtle-pulse,
+  .animate-float,
+  .animate-entrance {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-padding {
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+  .container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
