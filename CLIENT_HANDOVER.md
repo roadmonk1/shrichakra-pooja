@@ -236,9 +236,7 @@ shrichakra-website/
 │   │   ├── ParticleCanvas.jsx         # Golden ambient dust particles
 │   │   ├── FeaturedEventBanner.jsx    # Live countdown & event status ribbon
 │   │   ├── DigitalInvitationModal.jsx # Shareable invitation modal with WhatsApp/SMS/Calendar
-│   │   ├── LightboxModal.jsx          # High-res photo inspection modal
-│   │   ├── DemoBanner.jsx             # Top admin & checklist shortcut
-│   │   └── ClientChecklistModal.jsx   # Interactive presentation checklist for client review
+│   │   └── LightboxModal.jsx          # High-res photo inspection modal
 │   ├── context/
 │   │   └── LanguageContext.jsx        # Global multilingual provider (English, Kannada, Sanskrit)
 │   ├── data/

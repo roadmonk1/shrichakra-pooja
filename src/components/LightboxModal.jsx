@@ -193,7 +193,7 @@ export default function LightboxModal({
                 <User size={13} className="text-[#dfb15b]" />
                 {t('gallery.uploadedBy')}: {photo.uploadedBy}
               </span>
-              <span className="demo-watermark-badge">{t('gallery.demoBadge')}</span>
+              <span className="archive-tag">{t('gallery.archiveBadge')}</span>
             </div>
           </div>
 

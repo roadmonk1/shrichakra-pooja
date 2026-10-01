@@ -426,6 +426,11 @@ export const translations = {
       kn: 'ಭಕ್ತರ ನೆನಪುಗಳು',
       sa: 'भक्तसमर्पिताः स्मृतयः'
     },
+    archiveBadge: {
+      en: 'ARCHIVE',
+      kn: 'ಸಂಗ್ರಹ',
+      sa: 'सङ्ग्रहः'
+    },
     demoBadge: {
       en: 'ARCHIVE',
       kn: 'ಸಂಗ್ರಹ',
@@ -613,34 +618,10 @@ export const translations = {
       kn: 'ನಿರ್ವಾಹಕ ಪ್ರವೇಶ',
       sa: 'प्रबन्धक प्रवेशः'
     },
-    checklistBtn: {
-      en: 'Client Checklist',
-      kn: 'ಕ್ಲೈಂಟ್ ಪರಿಶೀಲನಾ ಪಟ್ಟಿ',
-      sa: 'अवलोकन सूचिका'
-    },
     copyright: {
       en: '© 2026 Shri Chakra Pooja — Shri Kshethra Kukkikatte. All rights reserved.',
       kn: '© ೨೦೨೬ ಶ್ರೀಚಕ್ರ ಮಹಾಪೂಜಾ ಸಮಿತಿ — ಶ್ರೀ ಕ್ಷೇತ್ರ ಕುಕ್ಕಿಕಟ್ಟೆ. ಸರ್ವ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.',
       sa: '© २०२६ श्रीचक्र पूजा — श्री क्षेत्र कुक्कीकट्टे। सर्वाधिकारारक्षिताः।'
-    }
-  },
-
-  // General Badges
-  demo: {
-    prototypeBanner: {
-      en: 'SHRI KSHETHRA KUKKIKATTE • ANNUAL SHRI CHAKRA POOJA',
-      kn: 'ಶ್ರೀ ಕ್ಷೇತ್ರ ಕುಕ್ಕಿಕಟ್ಟೆ • ವಾರ್ಷಿಕ ಶ್ರೀಚಕ್ರ ಮಹಾಪೂಜೆ',
-      sa: 'श्री क्षेत्र कुक्कीकट्टे • वार्षिक श्रीचक्र महापूजा'
-    },
-    prototypeDesc: {
-      en: 'Shri Chakra Pooja • 25 October 2026 • Shri Rama Nilaya, Kukkikatte',
-      kn: 'ಶ್ರೀಚಕ್ರ ಪೂಜೆ • ೨೫ ಅಕ್ಟೋಬರ್ ೨೦೨೬ • ಶ್ರೀ ರಾಮ ನಿಲಯ, ಕುಕ್ಕಿಕಟ್ಟೆ',
-      sa: 'श्रीचक्र पूजा • २५ अक्टोबर् २०२६ • श्री राम निलयम्, कुक्कीकट्टे'
-    },
-    watermark: {
-      en: 'SHRI KSHETHRA KUKKIKATTE',
-      kn: 'ಶ್ರೀ ಕ್ಷೇತ್ರ ಕುಕ್ಕಿಕಟ್ಟೆ',
-      sa: 'श्री क्षेत्र कुक्कीकट्टे'
     }
   }
 };

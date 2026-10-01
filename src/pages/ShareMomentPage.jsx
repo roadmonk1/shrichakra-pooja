@@ -89,7 +89,7 @@ export default function ShareMomentPage({
         }}
       >
         <div className="container" style={{ maxWidth: '820px' }}>
-          <span className="demo-tag" style={{ marginBottom: '12px' }}>
+          <span className="sacred-tag" style={{ marginBottom: '12px' }}>
             <Heart size={12} className="text-[#dfb15b]" />
             <span>{t('nav.share')}</span>
           </span>

@@ -37,7 +37,7 @@ export default function AboutPage({
         }}
       >
         <div className="container" style={{ maxWidth: '840px' }}>
-          <span className="demo-tag" style={{ marginBottom: '12px' }}>
+          <span className="sacred-tag" style={{ marginBottom: '12px' }}>
             <Sparkles size={12} />
             <span>{t('hero.geometrySummary')}</span>
           </span>
@@ -79,7 +79,7 @@ export default function AboutPage({
             const isEven = idx % 2 === 1; // Alternating layout
             const titleText = resolveText(sec.title, 'Sacred Section');
             const taglineText = resolveText(sec.tagline, 'Cosmic Principle');
-            const bodyContent = resolveText(sec.content, 'Client-provided content will appear here.');
+            const bodyContent = resolveText(sec.content, 'Sacred Sri Chakra spiritual geometry and worship.');
             const badgeText = resolveText(sec.badge, 'Knowledge');
 
             return (
@@ -176,7 +176,7 @@ export default function AboutPage({
                     >
                       {sectionIcons[idx]}
                     </div>
-                    <span className="demo-tag">{badgeText}</span>
+                    <span className="sacred-tag">{badgeText}</span>
                   </div>
 
                   <div
@@ -208,24 +208,11 @@ export default function AboutPage({
                       color: '#ded1be',
                       fontSize: '0.98rem',
                       lineHeight: 1.8,
-                      marginBottom: '20px'
+                      marginBottom: '10px'
                     }}
                   >
                     {bodyContent}
                   </p>
-
-                  <div
-                    style={{
-                      background: 'rgba(12, 3, 7, 0.6)',
-                      borderLeft: '3px solid #dfb15b',
-                      padding: '10px 14px',
-                      borderRadius: '0 6px 6px 0',
-                      fontSize: '0.78rem',
-                      color: '#bfa78a'
-                    }}
-                  >
-                    {t('demo.watermark')}: Client-provided history, family lineage, and Sanskrit verses will appear here.
-                  </div>
                 </div>
               </div>
             );

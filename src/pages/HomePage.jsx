@@ -25,7 +25,6 @@ export default function HomePage({
   setActivePage,
   featuredEvent,
   galleryPhotos,
-  onOpenChecklist,
   onOpenInvitation
 }) {
   const { language, t, resolveText } = useLanguage();

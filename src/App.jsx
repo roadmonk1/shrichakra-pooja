@@ -3,8 +3,6 @@ import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ParticleCanvas from './components/ParticleCanvas';
-import DemoBanner from './components/DemoBanner';
-import ClientChecklistModal from './components/ClientChecklistModal';
 import DigitalInvitationModal from './components/DigitalInvitationModal';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
@@ -19,7 +17,6 @@ import { storageService } from './services/storageService';
 function MainLayout() {
   const { language } = useLanguage();
   const [activePage, setActivePage] = useState('home');
-  const [isChecklistOpen, setIsChecklistOpen] = useState(false);
   const [isInvitationOpen, setIsInvitationOpen] = useState(false);
   const [invitationEvent, setInvitationEvent] = useState(null);
 
@@ -93,12 +90,6 @@ function MainLayout() {
       {/* Golden Ambient Particle Dust Canvas */}
       <ParticleCanvas particleCount={40} />
 
-      {/* Top Demo Banner */}
-      <DemoBanner
-        onOpenChecklist={() => setIsChecklistOpen(true)}
-        onNavigateAdmin={() => handlePageChange('admin')}
-      />
-
       {/* Sticky Sacred Navbar */}
       <Navbar
         activePage={activePage}
@@ -112,7 +103,6 @@ function MainLayout() {
             setActivePage={handlePageChange}
             featuredEvent={featuredEvent}
             galleryPhotos={galleryPhotos}
-            onOpenChecklist={() => setIsChecklistOpen(true)}
             onOpenInvitation={() => handleOpenInvitation(featuredEvent)}
           />
         )}
@@ -166,13 +156,6 @@ function MainLayout() {
       {/* Sacred Luxury Footer */}
       <Footer
         setActivePage={handlePageChange}
-        onOpenChecklist={() => setIsChecklistOpen(true)}
-      />
-
-      {/* Interactive Client Requirements Checklist Modal */}
-      <ClientChecklistModal
-        isOpen={isChecklistOpen}
-        onClose={() => setIsChecklistOpen(false)}
       />
 
       {/* Full-Screen Digital Invitation Modal */}

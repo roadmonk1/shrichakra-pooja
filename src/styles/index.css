@@ -338,7 +338,8 @@ body {
   padding-bottom: 96px;
 }
 
-/* Badge Demo Indicator */
+/* Sacred Badges & Tags */
+.sacred-tag,
 .demo-tag {
   display: inline-flex;
   align-items: center;
@@ -355,6 +356,7 @@ body {
   box-shadow: 0 0 10px rgba(223, 177, 91, 0.15);
 }
 
+.archive-tag,
 .demo-watermark-badge {
   font-size: 0.68rem;
   letter-spacing: 0.08em;
