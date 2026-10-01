@@ -633,14 +633,14 @@ export const translations = {
       sa: 'श्री क्षेत्र कुक्कीकट्टे • वार्षिक श्रीचक्र महापूजा'
     },
     prototypeDesc: {
-      en: 'Official portal featuring the Annual Pooja, 9 Avaranas, Sacred Legacy, Gallery, and Digital Patrika.',
-      kn: 'ವಾರ್ಷಿಕ ಪೂಜೆ, ನವಾವರಣಗಳು, ಪರಂಪರೆ, ಚಿತ್ರಶಾಲೆ ಮತ್ತು ಡಿಜಿಟಲ್ ಆಹ್ವಾನ ಪತ್ರಿಕೆಯ ಅಧಿಕೃತ ತಾಣ.',
-      sa: 'वार्षिक पूजा, नवावरणानि, पावनपरम्परा, चित्रावली, निमन्त्रण पत्रस्य च अधिकृतं स्थानम्।'
+      en: 'Shri Chakra Pooja • 25 October 2026 • Shri Rama Nilaya, Kukkikatte',
+      kn: 'ಶ್ರೀಚಕ್ರ ಪೂಜೆ • ೨೫ ಅಕ್ಟೋಬರ್ ೨೦೨೬ • ಶ್ರೀ ರಾಮ ನಿಲಯ, ಕುಕ್ಕಿಕಟ್ಟೆ',
+      sa: 'श्रीचक्र पूजा • २५ अक्टोबर् २०२६ • श्री राम निलयम्, कुक्कीकट्टे'
     },
     watermark: {
-      en: 'SHRI KUKKIKATTE',
-      kn: 'ಶ್ರೀ ಕುಕ್ಕಿಕಟ್ಟೆ',
-      sa: 'श्री कुक्कीकट्टे'
+      en: 'SHRI KSHETHRA KUKKIKATTE',
+      kn: 'ಶ್ರೀ ಕ್ಷೇತ್ರ ಕುಕ್ಕಿಕಟ್ಟೆ',
+      sa: 'श्री क्षेत्र कुक्कीकट्टे'
     }
   }
 };
